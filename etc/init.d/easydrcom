@@ -1,0 +1,55 @@
+#!/bin/sh /etc/rc.common
+#Author:corecode
+
+START=55
+STOP=10
+
+start()
+{
+
+if [ $(uci get easydrcom.@login[0].boot) ] ;
+then
+	/etc/init.d/easydrcom enable
+else
+	/etc/init.d/easydrcom disable
+fi
+
+if [ $(uci get easydrcom.@login[0].enable) ] ;
+then
+	echo [General] > /etc/easydrcom.conf
+	echo UserName=$(uci get easydrcom.@login[0].UserName) >> /etc/easydrcom.conf
+	echo PassWord=$(uci get easydrcom.@login[0].PassWord) >> /etc/easydrcom.conf
+	echo Mode=$(uci get easydrcom.@login[0].Mode) >> /etc/easydrcom.conf
+	echo AutoOnline=1 >> /etc/easydrcom.conf
+	echo AutoRedial=$(uci get easydrcom.@login[0].AutoRedial) >> /etc/easydrcom.conf
+	echo [Remote] >> /etc/easydrcom.conf
+	echo IP=$(uci get easydrcom.@login[0].IP) >> /etc/easydrcom.conf
+	echo Port=$(uci get easydrcom.@login[0].Port) >> /etc/easydrcom.conf
+	echo UseBroadcast=$(uci get easydrcom.@login[0].UseBroadcast) >> /etc/easydrcom.conf
+	echo MAC=$(uci get easydrcom.@login[0].MAC) >> /etc/easydrcom.conf
+	echo [Local] >> /etc/easydrcom.conf
+	echo NIC=$(uci get easydrcom.@login[0].NIC) >> /etc/easydrcom.conf
+	echo EAPTimeout=$(uci get easydrcom.@login[0].EAPTimeout) >> /etc/easydrcom.conf
+	echo UDPTimeout=$(uci get easydrcom.@login[0].UDPTimeout) >> /etc/easydrcom.conf
+  echo HostName=$(uci get easydrcom.@login[0].HostName) >> /etc/easydrcom.conf
+  echo KernelVersion=$(uci get easydrcom.@login[0].KernelVersion) >> /etc/easydrcom.conf
+	Easydrcom  -r -b -c /etc/easydrcom.conf &
+	echo "EasyDrcom Client has started."
+else
+	stop
+fi
+
+
+}
+
+stop()
+{
+	killall Easydrcom
+	echo "EasyDrcom Client has stoped."
+}
+
+restart()
+{
+stop
+start
+}
